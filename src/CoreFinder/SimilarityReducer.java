@@ -1,3 +1,4 @@
+package CoreFinder;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,12 +50,8 @@ public class SimilarityReducer extends Reducer<Text, Text, Text, Text> {
 				
 		Configuration conf = context.getConfiguration();
 		// Get the similarity threshold from the job parameters
-	    //String par_epsilon = conf.get("epsilon");
-	    double eps = 0.7;//Double.parseDouble(par_epsilon);
-	    // FIXME Por algum motivo, não estou conseguindo carregar 
-	    // dados do context...
-	    //String par_mi = conf.get("mi");
-	    
+	    String par_epsilon = conf.get("epsilon");
+	    double eps = Double.parseDouble(par_epsilon);    
     	Iterator<Text> it = values.iterator();
     	// Attributes already in the desired order thanks to the mapper
     	Record r = new Record(it.next().toString());

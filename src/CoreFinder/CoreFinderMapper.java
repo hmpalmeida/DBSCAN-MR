@@ -1,3 +1,4 @@
+package CoreFinder;
 import java.io.IOException;
 import java.util.StringTokenizer;
 
@@ -6,7 +7,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
 
-public class CoreFinderMapper   extends Mapper<LongWritable, Text, Text, Text>{
+public class CoreFinderMapper extends Mapper<LongWritable, Text, Text, Text>{
 	
 	public void map(LongWritable key, Text value, Context context) 
 			throws IOException, InterruptedException{    

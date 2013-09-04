@@ -1,3 +1,4 @@
+package CoreFinder;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -30,6 +31,7 @@ public class SimilarityMapper  extends Mapper<LongWritable, Text, Text, Text> {
 	    // hardcoded or set it in the jobrunner class and retrieve via this key
 	    //String location = conf.get("job.customorder.path");
 	    
+	    // FIXME should not be hardwired!
 	    String location = "/user/helio/outputs/field-entropy-tmp.txt";
 	    
 		Vector<AttrEntropy> vae = new Vector<AttrEntropy>();
@@ -97,7 +99,7 @@ public class SimilarityMapper  extends Mapper<LongWritable, Text, Text, Text> {
 		// Get the similarity threshold from the job parameters
 		Configuration conf = context.getConfiguration();
 	    String par_epsilon = conf.get("epsilon");
-	    double eps = 0.7;//Double.parseDouble(par_epsilon);
+	    double eps = Double.parseDouble(par_epsilon);
 	    
 		// Read and tokenize text string. 
 		String line = value.toString();
@@ -110,7 +112,7 @@ public class SimilarityMapper  extends Mapper<LongWritable, Text, Text, Text> {
 		// Use individual to generate output pairs
 		for (int i = 0; i < prefix_size; ++i) {
 			Text outkey = new Text();
-			outkey.set(r.attributes.get(i));
+			outkey.set(String.valueOf(i)+"-"+r.attributes.get(i));
 			context.write(outkey, new Text(r.toString()));
 		}
 	}
