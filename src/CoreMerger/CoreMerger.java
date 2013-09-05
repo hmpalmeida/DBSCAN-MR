@@ -87,14 +87,52 @@ public class CoreMerger {
 		}
 	}
 	
+
+	private void generateCoresOnly(String cores_file, String cores_only_file) throws IOException {
+		Configuration conf = new Configuration();
+		conf.set("fs.default.name","hdfs://127.0.0.1:54310/");		
+		FileSystem dfs = FileSystem.get(conf);
+		conf.set("job.core.file", cores_file);
+		
+        Job job = new Job(conf, "CoresOnly");
+        
+        job.setOutputKeyClass(Text.class);
+        job.setOutputValueClass(Text.class);
+               
+        job.setMapperClass(CoresOnlyMapper.class);
+        job.setReducerClass(CoresOnlyReducer.class);
+       
+        job.setInputFormatClass(TextInputFormat.class);
+        job.setOutputFormatClass(TextOutputFormat.class);
+        
+        FileInputFormat.addInputPath(job, new Path(cores_file));
+		Path output = new Path(cores_only_file);
+		if (dfs.exists(output)) dfs.delete(output, true);
+        FileOutputFormat.setOutputPath(job, output);
+            
+        try {
+			job.waitForCompletion(true);
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	public boolean run(String cores_file, String final_file) throws IOException {
 		Path p = new Path(final_file);
+		// TODO First, we must obtain a file with only the cores
+		String cores_only_file = 
+				new String(p.getParent().toString()+"/cores-only.txt");
+		generateCoresOnly(cores_file, cores_only_file);
 		String merged_file_a = 
 				new String(p.getParent().toString()+"/merged-cores-a.txt");
 		String merged_file_b = 
 				new String(p.getParent().toString()+"/merged-cores-b.txt");
 		String[] files = new String[]{merged_file_a, merged_file_b};
-		int MAX_STEPS = 2;//30;
+		int MAX_STEPS = 30;
 		int step = 0;
 		long counter = doMergeStep(cores_file, files[0]);
 		while (counter > 0 && step < MAX_STEPS) {
@@ -106,13 +144,11 @@ public class CoreMerger {
 		// Remove temporary files
 		Configuration conf = new Configuration();
 		conf.set("fs.default.name","hdfs://127.0.0.1:54310/");
-		/*
 		FileSystem dfs = FileSystem.get(conf);
 		Path file = new Path(merged_file_a);
 		if (dfs.exists(file)) dfs.delete(file, true);
 		file = new Path(merged_file_b);
 		if (dfs.exists(file)) dfs.delete(file, true);
-		*/
 		// Check if the algorithm converged
 		if (counter == 0) {
 			return true;
@@ -120,5 +156,6 @@ public class CoreMerger {
 			return false;
 		}
 	}
+
 
 }

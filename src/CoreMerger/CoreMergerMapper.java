@@ -22,7 +22,7 @@ public class CoreMergerMapper  extends Mapper<LongWritable, Text, Text, Text> {
 		StringTokenizer tokenizer = new StringTokenizer(line);
 		while (tokenizer.hasMoreTokens()) {
 			fields.add(tokenizer.nextToken());
-		}
+		} 
 		// !FWD! and !QRY! signaled entries will be treated at the reducer
 		if (fields.get(1).compareTo("!FWD!") == 0 ||
 				fields.get(1).compareTo("!QRY!") == 0) {
@@ -30,6 +30,10 @@ public class CoreMergerMapper  extends Mapper<LongWritable, Text, Text, Text> {
 			val.set(fields.get(1)+" "+fields.get(2));
 			context.write(k, val);						
 		} else {
+			// Notify that this element is a !CORE!
+			k.set(fields.get(0));
+			val.set("!CORE!");
+			context.write(k, val);
 			List<Long> lfields = new ArrayList<Long>();
 			for (int i = 0; i < fields.size(); ++i) {
 				lfields.add(Long.valueOf(fields.get(i)));				

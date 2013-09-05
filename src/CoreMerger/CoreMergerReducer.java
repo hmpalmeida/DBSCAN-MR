@@ -19,6 +19,7 @@ public class CoreMergerReducer extends Reducer<Text, Text, Text, Text> {
     		throws IOException, InterruptedException {
 		int this_key = Integer.valueOf(key.toString());
 		int MAXINT = 2147483647;
+		boolean iscore = false;
 		Iterator<Text> it = values.iterator();
 		Set<Long> elements = new TreeSet<Long>();
 		Set<String> qry_set = new TreeSet<String>();
@@ -32,6 +33,8 @@ public class CoreMergerReducer extends Reducer<Text, Text, Text, Text> {
     			if (fwd_to < min_fwd) min_fwd = fwd_to; 
     		} else if (first.compareTo("!QRY!") == 0) {
     			qry_set.add(tokenizer.nextToken());
+    		} else if (first.compareTo("!CORE!") == 0){
+    			iscore = true;
     		} else {
     			elements.add(Long.valueOf(first));
     			while (tokenizer.hasMoreTokens())
@@ -47,30 +50,33 @@ public class CoreMergerReducer extends Reducer<Text, Text, Text, Text> {
     	Text output = new Text(el_str);
     	Text k = new Text();
     	// Everything read, now output results
-    	if ((min_fwd == MAXINT || min_fwd == this_key) 
+    	if ((min_fwd == MAXINT || min_fwd == this_key)
     			&& !el_str.isEmpty()) {
     		// No forwarding path. This is the "sink" node
     		context.write(key, output);
     	} else if (!el_str.isEmpty()) {
     		k.set(String.valueOf(min_fwd));
     		context.write(k, output);
-    		// TODO Since I've sent info to another element, we must
+    		// Since I've sent info to another element, we must
     		// run another round
     		context.getCounter(UpdateCounter.UPDATED).increment(1);
     	}
+    	// TODO Only print !QRY! or !FWD! if it is a !CORE!
     	// Print this element's default forward
-    	if (min_fwd != MAXINT) {
+    	if (min_fwd != MAXINT && iscore) {
     		output.set("!FWD! "+String.valueOf(min_fwd));
     		context.write(key, output);
     	}
     	// Print forward suggestions for each !QRY! received
-    	Iterator<String> it3 = qry_set.iterator();
-    	while (it3.hasNext()) {
-    		k.set(it3.next());
-    		context.write(k, output);
+    	if (iscore) {
+			Iterator<String> it3 = qry_set.iterator();
+			while (it3.hasNext()) {
+				k.set(it3.next());
+				context.write(k, output);
+			}
     	}
     	// Print !QRY!, if necessary
-    	if (min_fwd != MAXINT && min_fwd != this_key) {
+    	if (min_fwd != MAXINT && min_fwd != this_key && iscore) {
     		k.set(String.valueOf(min_fwd));
     		output.set("!QRY! "+key.toString());
     		context.write(k, output);
