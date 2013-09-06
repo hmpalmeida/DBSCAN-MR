@@ -8,9 +8,11 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.MultipleInputs;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
+
 
 public class CoreMerger {
 	
@@ -55,7 +57,43 @@ public class CoreMerger {
         return counter;
 	}
 	
-	private void doFileCleanup(String input_file, String output_file) throws IOException {
+	private void doPartialMerge(String merged_cores_file, String cores_file, 
+			String tmp_file) throws IOException {
+		Configuration conf = new Configuration();
+		conf.set("fs.default.name","hdfs://127.0.0.1:54310/");		
+		FileSystem dfs = FileSystem.get(conf);
+		
+        Job job = new Job(conf, "PartialMerge");
+              
+        job.setOutputKeyClass(Text.class);
+        job.setOutputValueClass(Text.class);
+               
+        job.setReducerClass(PartialMergeReducer.class);
+        
+        job.setOutputFormatClass(TextOutputFormat.class);
+                
+		MultipleInputs.addInputPath(job, new Path(merged_cores_file), 
+				TextInputFormat.class, MergedCoresMapper.class);
+		MultipleInputs.addInputPath(job, new Path(cores_file), 
+				TextInputFormat.class, CoresMapper.class);		
+        
+		Path temp = new Path(tmp_file);
+		if (dfs.exists(temp)) dfs.delete(temp, true);
+		FileOutputFormat.setOutputPath(job, temp);
+        
+        try {
+			job.waitForCompletion(true);
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	// Like the Basic Record Join from the original paper.
+	private void doMerge(String partial_merge_file, String output_file) throws IOException {
 		Configuration conf = new Configuration();
 		conf.set("fs.default.name","hdfs://127.0.0.1:54310/");		
 		FileSystem dfs = FileSystem.get(conf);
@@ -65,13 +103,13 @@ public class CoreMerger {
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
                
-        job.setMapperClass(CCleanerMapper.class);
-        job.setReducerClass(CCleanerReducer.class);
+        job.setMapperClass(FinalMergeMapper.class);
+        job.setReducerClass(FinalMergeReducer.class);
        
         job.setInputFormatClass(TextInputFormat.class);
         job.setOutputFormatClass(TextOutputFormat.class);
         
-        FileInputFormat.addInputPath(job, new Path(input_file));
+        FileInputFormat.addInputPath(job, new Path(partial_merge_file));
 		Path output = new Path(output_file);
 		if (dfs.exists(output)) dfs.delete(output, true);
         FileOutputFormat.setOutputPath(job, output);
@@ -134,21 +172,28 @@ public class CoreMerger {
 		String[] files = new String[]{merged_file_a, merged_file_b};
 		int MAX_STEPS = 30;
 		int step = 0;
-		long counter = doMergeStep(cores_file, files[0]);
+		long counter = doMergeStep(cores_only_file, files[0]);
 		while (counter > 0 && step < MAX_STEPS) {
 			++step;
 			counter = doMergeStep(files[(step-1) % 2], files[step % 2]);
 		}
 		// Clean up the file for final answer
-		doFileCleanup(files[step % 2], final_file);
+		String tmp_file = new String(p.getParent().toString()+"/merged_tmp.txt");
+		doPartialMerge(files[step % 2], cores_file, tmp_file);
+		doMerge(tmp_file, final_file);
+		//doFinalMerge(files[step % 2], cores_file, final_file);
 		// Remove temporary files
 		Configuration conf = new Configuration();
 		conf.set("fs.default.name","hdfs://127.0.0.1:54310/");
 		FileSystem dfs = FileSystem.get(conf);
 		Path file = new Path(merged_file_a);
+		/*
 		if (dfs.exists(file)) dfs.delete(file, true);
 		file = new Path(merged_file_b);
 		if (dfs.exists(file)) dfs.delete(file, true);
+		file = new Path(tmp_file);
+		if (dfs.exists(file)) dfs.delete(file, true);
+		*/
 		// Check if the algorithm converged
 		if (counter == 0) {
 			return true;
