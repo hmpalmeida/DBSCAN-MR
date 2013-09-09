@@ -24,7 +24,7 @@ public class FinalMergeReducer  extends Reducer<Text, Text, Text, Text> {
     	String vals = new String("");
     	Iterator<Long> it = elements.iterator();
     	while (it.hasNext()) {
-    		vals += String.valueOf(it.next());
+    		vals += " " + String.valueOf(it.next());
     	}
     	context.write(key, new Text(vals));
 	}

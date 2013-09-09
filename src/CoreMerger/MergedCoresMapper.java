@@ -16,7 +16,7 @@ public class MergedCoresMapper extends Mapper<LongWritable, Text, Text, Text> {
 		String first = tokenizer.nextToken();
 		String second = tokenizer.nextToken();
 		// Value = signal to send things to the responsible ID
-		if (second.compareTo("!FWD!") != 0 || 
+		if (second.compareTo("!FWD!") != 0 && 
 				second.compareTo("!QRY!") != 0) {
 			Text val = new Text("!FWD! " + first);
 			Text k = new Text(second);

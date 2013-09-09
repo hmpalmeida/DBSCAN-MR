@@ -187,13 +187,11 @@ public class CoreMerger {
 		conf.set("fs.default.name","hdfs://127.0.0.1:54310/");
 		FileSystem dfs = FileSystem.get(conf);
 		Path file = new Path(merged_file_a);
-		/*
 		if (dfs.exists(file)) dfs.delete(file, true);
 		file = new Path(merged_file_b);
 		if (dfs.exists(file)) dfs.delete(file, true);
 		file = new Path(tmp_file);
 		if (dfs.exists(file)) dfs.delete(file, true);
-		*/
 		// Check if the algorithm converged
 		if (counter == 0) {
 			return true;
