@@ -181,7 +181,6 @@ public class CoreMerger {
 		String tmp_file = new String(p.getParent().toString()+"/merged_tmp.txt");
 		doPartialMerge(files[step % 2], cores_file, tmp_file);
 		doMerge(tmp_file, final_file);
-		//doFinalMerge(files[step % 2], cores_file, final_file);
 		// Remove temporary files
 		Configuration conf = new Configuration();
 		conf.set("fs.default.name","hdfs://127.0.0.1:54310/");

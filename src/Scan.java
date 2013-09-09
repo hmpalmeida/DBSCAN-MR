@@ -27,17 +27,18 @@ public class Scan {
 		String cores_file = 
 				new String(p.getParent().toString()+"/cores.txt");
 		CoreFinder cf = new CoreFinder();
-		// TODO 2nd part (finding the cores)
+		// 2nd part (finding the cores)
 		long startTime = System.currentTimeMillis();
-		cf.run(epsilon, mi, this.input_file, order_file, cores_file);
+		String stats = cf.run(epsilon, mi, this.input_file, order_file, cores_file);
 		long endTime = System.currentTimeMillis();
 		String times = new String(" " + String.valueOf(endTime - startTime));
 		CoreMerger cm = new CoreMerger();
-		// TODO 3rd part (merging the cores)
+		// 3rd part (merging the cores)
 		startTime = System.currentTimeMillis();
 		boolean converge = cm.run(cores_file, this.output_file);
 		endTime = System.currentTimeMillis();
 		times += " " + String.valueOf(endTime - startTime);
+		times += "\n------------------------------\n" + stats +"\n------------------------------\n";
 		return times;
 	}
 	
@@ -57,7 +58,7 @@ public class Scan {
 		Path p = new Path(output_file);
 		String order_file = 
 				new String(p.getParent().toString()+"/field-entropy-tmp.txt");
-		// TODO MEasure 1st step (creating entropy-based order)
+		// 1st step (creating entropy-based order)
 		long startTime = System.currentTimeMillis();
 		eo.generateOrder(order_file);
 		long endTime = System.currentTimeMillis();
