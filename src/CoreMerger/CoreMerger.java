@@ -44,10 +44,8 @@ public class CoreMerger {
         try {
 			job.waitForCompletion(true);
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
         
@@ -84,10 +82,8 @@ public class CoreMerger {
         try {
 			job.waitForCompletion(true);
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -151,17 +147,15 @@ public class CoreMerger {
         try {
 			job.waitForCompletion(true);
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
 	public boolean run(String cores_file, String final_file) throws IOException {
 		Path p = new Path(final_file);
-		// TODO First, we must obtain a file with only the cores
+		// First, we must obtain a file with only the cores
 		String cores_only_file = 
 				new String(p.getParent().toString()+"/cores-only.txt");
 		generateCoresOnly(cores_file, cores_only_file);
@@ -190,6 +184,10 @@ public class CoreMerger {
 		file = new Path(merged_file_b);
 		if (dfs.exists(file)) dfs.delete(file, true);
 		file = new Path(tmp_file);
+		if (dfs.exists(file)) dfs.delete(file, true);
+		file = new Path(cores_file);
+		if (dfs.exists(file)) dfs.delete(file, true);
+		file = new Path(cores_only_file);
 		if (dfs.exists(file)) dfs.delete(file, true);
 		// Check if the algorithm converged
 		if (counter == 0) {

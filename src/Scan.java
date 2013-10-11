@@ -35,6 +35,9 @@ public class Scan {
 		CoreMerger cm = new CoreMerger();
 		// 3rd part (merging the cores)
 		startTime = System.currentTimeMillis();
+		// Cleanup: removal of cores_file is done inside cm.run(). Not the
+		// best way, but the easier, as it already removes other files
+		// from the DFS
 		boolean converge = cm.run(cores_file, this.output_file);
 		endTime = System.currentTimeMillis();
 		times += " " + String.valueOf(endTime - startTime);
@@ -53,7 +56,7 @@ public class Scan {
 		if (args[0].compareTo("sig") == 0) {
 			sig = true;
 		}
-		System.out.println(sig);
+		//System.out.println(sig);
 		double epsilon = Double.parseDouble(args[1]);
 		int mi = Integer.parseInt(args[2]);
 		String input_file = args[3];
@@ -78,6 +81,8 @@ public class Scan {
 		Scan s = new Scan(input_file, output_file);
 		times += s.runScan(epsilon, mi, order_file);
 		System.out.println(times);
+		// Should remove the field-entropy-tmp file here, 
+		// otherwise, it is not very tmp... 
 	}
 	
 }

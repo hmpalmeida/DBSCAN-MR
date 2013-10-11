@@ -40,7 +40,6 @@ public class EntropyOrder {
         job.setOutputFormatClass(TextOutputFormat.class);
         
         FileInputFormat.addInputPath(job, new Path(this.input));
-        // FIXME temporary output file
 		Path output = new Path(order_file);
 		if (dfs.exists(output)) dfs.delete(output, true);
         FileOutputFormat.setOutputPath(job, output);
@@ -48,10 +47,8 @@ public class EntropyOrder {
         try {
 			job.waitForCompletion(true);
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return true;		
