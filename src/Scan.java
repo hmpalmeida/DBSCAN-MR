@@ -49,18 +49,27 @@ public class Scan {
 
 	public static void main(String[] args) throws Exception {
 		// Adding legibility to the inputs
-		double epsilon = Double.parseDouble(args[0]);
-		int mi = Integer.parseInt(args[1]);
-		String input_file = args[2];
-		String output_file = args[3];
-	    // First, obtain the entropy order of the attributes
+		boolean sig = false;
+		if (args[0].compareTo("sig") == 0) {
+			sig = true;
+		}
+		System.out.println(sig);
+		double epsilon = Double.parseDouble(args[1]);
+		int mi = Integer.parseInt(args[2]);
+		String input_file = args[3];
+		String output_file = args[4];
+		long startTime = System.currentTimeMillis();		
+		// First, obtain the entropy order of the attributes
 		EntropyOrder eo = new EntropyOrder(input_file);
 		Path p = new Path(output_file);
 		String order_file = 
 				new String(p.getParent().toString()+"/field-entropy-tmp.txt");
-		// 1st step (creating entropy-based order)
-		long startTime = System.currentTimeMillis();
-		eo.generateOrder(order_file);
+			// 1st step (creating entropy-based order)
+		if (sig) {
+			eo.generateOrder(order_file);
+		} else {
+			order_file = "";
+		}
 		long endTime = System.currentTimeMillis();
 		String times = new String();
 		times = input_file + " " + args[0] + " " + args[1] + 

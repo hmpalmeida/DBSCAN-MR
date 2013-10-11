@@ -32,8 +32,8 @@ public class CoreFinder {
 		Configuration conf = new Configuration();
 		conf.set("fs.default.name","hdfs://127.0.0.1:54310/");		
 		FileSystem dfs = FileSystem.get(conf);
-		Path file = new Path(similarities_file);
-		if (dfs.exists(file)) dfs.delete(file, true);
+		//Path file = new Path(similarities_file);
+		//if (dfs.exists(file)) dfs.delete(file, true);
 		return stats;
 	}
 	

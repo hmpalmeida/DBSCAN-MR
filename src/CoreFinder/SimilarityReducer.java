@@ -36,16 +36,13 @@ public class SimilarityReducer extends Reducer<Text, Text, Text, Text> {
 		return vertex1.size()/(Math.sqrt(v1_size*v2_size));
 	}
 	
-	
+	// TODO está imprimindo valores que não tem nenhum outro registro similar. Checar o porquê. 
 	public void reduce(Text key, Iterable<Text> values, Context context) 
     		throws IOException, InterruptedException {
-		//String line = null;
 		
 		HashMap<String, String> similar_records = 
 				new HashMap<String, String>();
 		String similar = new String();
-	    //map.add( new Integer( 2 ), "two" );
-		//String similar = new String();
 		Vector<Record> records = new Vector<Record>();
 				
 		Configuration conf = context.getConfiguration();
@@ -53,7 +50,8 @@ public class SimilarityReducer extends Reducer<Text, Text, Text, Text> {
 	    String par_epsilon = conf.get("epsilon");
 	    double eps = Double.parseDouble(par_epsilon);    
     	Iterator<Text> it = values.iterator();
-    	// Attributes already in the desired order thanks to the mapper
+    	// Attributes already in the desired order (by attribute entropy) 
+    	// thanks to the mapper
     	Record r = new Record(it.next().toString());
     	// Using this first run to read all data, while already checking
     	// the similarities for the first record
@@ -76,7 +74,8 @@ public class SimilarityReducer extends Reducer<Text, Text, Text, Text> {
     		records.add(r2);
     	}
     	// Print the similar records
-    	context.write(new Text(r.getIdStr()), new Text(similar));
+    	if (!similar.trim().isEmpty())
+    		context.write(new Text(r.getIdStr()), new Text(similar));
     	// Now do a loop to check the other records
     	for (int i = 0; i < records.size(); ++i) {
     		r = records.get(i);
@@ -103,7 +102,8 @@ public class SimilarityReducer extends Reducer<Text, Text, Text, Text> {
         		}
     		}
     		// Print the similar records
-    		context.write(new Text(r.getIdStr()), new Text(similar));
+        	if (!similar.trim().isEmpty())
+        		context.write(new Text(r.getIdStr()), new Text(similar));
     	}
 	}
 

@@ -14,14 +14,18 @@ public class Record {
 		this.id = Long.parseLong(tokenizer.nextToken());
 		this.attributes = new Vector<String>();
 		while (tokenizer.hasMoreTokens()) {
-			this.attributes.add(tokenizer.nextToken());			
+			String tmp = tokenizer.nextToken().trim();
+			if (!tmp.isEmpty()) this.attributes.add(tmp);			
 		}
 		return true;
 	}
 	
 	public boolean loadData(String data, Vector<Integer> custom_order) {
-		if (custom_order.size() == 0 || custom_order == null) {
+		if (custom_order == null) {
 			return false;
+		}
+		if (custom_order.size() == 0) {
+			return this.loadData(data);
 		}
 		// read and tokenize text string
 		StringTokenizer tokenizer = new StringTokenizer(data);
@@ -38,7 +42,7 @@ public class Record {
 			return false;
 		} else {
 			for (int i = 0; i < custom_order.size(); ++i) {
-				this.attributes.add(i, tmp.get(custom_order.get(i)));
+				this.attributes.set(i, tmp.get(custom_order.get(i)));
 			}
 			return true;
 		}
@@ -59,7 +63,7 @@ public class Record {
 		String output = new String("");
 		output += String.valueOf(this.id);
 		for (int i = 0; i < this.attributes.size(); ++i) {
-			output += "  " + this.attributes.get(i);
+			output += " " + this.attributes.get(i);
 		}
 		return output;
 	}
@@ -71,7 +75,7 @@ public class Record {
 	public String getAttrStr() {
 		String output = new String("");
 		for (int i = 0; i < this.attributes.size(); ++i) {
-			output += "  " + this.attributes.get(i);
+			output += " " + this.attributes.get(i);
 		}
 		return output;
 	}
@@ -87,6 +91,10 @@ public class Record {
 			}
 		}
 		return equals/(double)this.attributes.size();
+	}
+	
+	public int size() {
+		return this.attributes.size();
 	}
 
 }
