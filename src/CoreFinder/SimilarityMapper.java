@@ -120,7 +120,7 @@ public class SimilarityMapper  extends Mapper<LongWritable, Text, Text, Text> {
 		for (int i = 0; i < prefix_size; ++i) {
 			Text outkey = new Text();
 			outkey.set(String.valueOf(i)+"-"+r.attributes.get(i));
-			context.write(outkey, new Text(r.toString()+" * "+String.valueOf(r.size())+" * "+String.valueOf(prefix_size)));
+			context.write(outkey, new Text(r.toString()));
 		}
 	}
 

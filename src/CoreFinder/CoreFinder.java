@@ -23,18 +23,21 @@ public class CoreFinder {
 			String order_file, String cores_file) throws IOException {
 		Path p = new Path(cores_file);
 		String stats = new String();
+		long sim_start_time = System.currentTimeMillis();
 		String similarities_file = 
 				new String(p.getParent().toString()+"/similarities-tmp.txt");
-		//String similarities_file = "/user/helio/outputs/similarities-tmp.txt";
 		stats = findSimilars(epsilon, input_file, order_file, similarities_file);
+		long sim_time = System.currentTimeMillis() - sim_start_time;
 		// May delete similarities_file here
+		long cores_start_time = System.currentTimeMillis();
 		stats += defineCores(mi, similarities_file, cores_file);
+		long cores_time = System.currentTimeMillis() - cores_start_time;
 		Configuration conf = new Configuration();
 		conf.set("fs.default.name","hdfs://127.0.0.1:54310/");		
 		FileSystem dfs = FileSystem.get(conf);
 		Path file = new Path(similarities_file);
 		if (dfs.exists(file)) dfs.delete(file, true);
-		return stats;
+		return stats + "( " + String.valueOf(sim_time) + " , " + String.valueOf(cores_time) + " )";
 	}
 	
 	private String findSimilars(double epsilon, String input_file, 
@@ -118,10 +121,8 @@ public class CoreFinder {
         try {
 			job.waitForCompletion(true);
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
         

@@ -93,6 +93,26 @@ public class Record {
 		return equals/(double)this.attributes.size();
 	}
 	
+	public int firstMatch(Record r) {
+		if (r == null || 
+				r.attributes.size() != this.attributes.size()) 
+			return -1;
+		int match = 0;
+		boolean found = false;
+		while (match < this.size() && !found) {
+			if (this.attributes.get(match).compareTo(r.attributes.get(match)) == 0) {
+				found = true;				
+			} else {
+				match++;
+			}
+		}
+		if (found) {
+			return match;
+		} else {
+			return -1;
+		}
+	}
+	
 	public int size() {
 		return this.attributes.size();
 	}

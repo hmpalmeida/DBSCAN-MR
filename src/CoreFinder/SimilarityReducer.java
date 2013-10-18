@@ -36,13 +36,19 @@ public class SimilarityReducer extends Reducer<Text, Text, Text, Text> {
 		return vertex1.size()/(Math.sqrt(v1_size*v2_size));
 	}
 	
-	// TODO está imprimindo valores que não tem nenhum outro registro similar. Checar o porquê. 
 	public void reduce(Text key, Iterable<Text> values, Context context) 
     		throws IOException, InterruptedException {
+		// Identity reducer for map testing
+		/*
+		Iterator<Text> it = values.iterator();
+		while (it.hasNext()) {
+			context.write(key, it.next());
+		}
+		*/
+		// What is this key's attribute position?
+		StringTokenizer tokenizer = new StringTokenizer(key.toString(), "-");
+		int key_pos = Integer.valueOf(tokenizer.nextToken());
 		
-		HashMap<String, String> similar_records = 
-				new HashMap<String, String>();
-		String similar = new String();
 		Vector<Record> records = new Vector<Record>();
 				
 		Configuration conf = context.getConfiguration();
@@ -55,6 +61,44 @@ public class SimilarityReducer extends Reducer<Text, Text, Text, Text> {
     	Record r = new Record(it.next().toString());
     	// Using this first run to read all data, while already checking
     	// the similarities for the first record
+    	Text idr = new Text();
+    	Text idr2 = new Text();
+    	while (it.hasNext()) {
+    		idr.set(r.getIdStr());
+    		Record r2 = new Record(it.next().toString());
+    		// evaluate similarity
+			double sim = r.checkSimilarity(r2);
+    		if (sim >= eps) {
+    			int first_match = r.firstMatch(r2);
+    			if (key_pos == first_match) {
+    				idr2.set(r2.getIdStr());
+    				context.write(idr, idr2);
+    				context.write(idr2, idr);
+    			}
+    		}
+    		// Store r2 for later checking
+    		records.add(r2);
+    	}
+    	// Now do a loop to check the other records
+    	for (int i = 0; i < records.size(); ++i) {
+    		r = records.get(i);
+    		idr.set(r.getIdStr());
+    		// Getting similar records that were already checked
+    		// For all records following it
+    		for (int j = i+1; j < records.size(); ++j) {
+    			Record r2 = records.get(j);
+    			double sim = r.checkSimilarity(r2);
+        		if (sim >= eps) {
+        			int first_match = r.firstMatch(r2);
+        			if (key_pos == first_match) {
+        				idr2.set(r2.getIdStr());
+        				context.write(idr, idr2);
+        				context.write(idr2, idr);
+        			}
+        		}
+    		}
+    	}
+    	/*
     	while (it.hasNext()) {
     		Record r2 = new Record(it.next().toString());
     		// evaluate similarity
@@ -76,6 +120,7 @@ public class SimilarityReducer extends Reducer<Text, Text, Text, Text> {
     	// Print the similar records
     	if (!similar.trim().isEmpty())
     		context.write(new Text(r.getIdStr()), new Text(similar));
+    		
     	// Now do a loop to check the other records
     	for (int i = 0; i < records.size(); ++i) {
     		r = records.get(i);
@@ -105,6 +150,7 @@ public class SimilarityReducer extends Reducer<Text, Text, Text, Text> {
         	if (!similar.trim().isEmpty())
         		context.write(new Text(r.getIdStr()), new Text(similar));
     	}
+    	*/
 	}
 
 }
