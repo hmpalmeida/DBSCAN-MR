@@ -25,10 +25,13 @@ public class EntropyOrder {
 	
 	public boolean generateOrder(String order_file) throws IOException {
 		Configuration conf = new Configuration();
-		conf.set("fs.default.name","hdfs://127.0.0.1:54310/");		
+		// FIXME SETTING THE FILESYSTEM?
+		//conf.set("fs.default.name","hdfs://127.0.0.1:54310/");		
 		FileSystem dfs = FileSystem.get(conf);
 		
         Job job = new Job(conf, "EntropyOrder");
+        
+        job.setJarByClass(EntropyOrder.class);
         
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);

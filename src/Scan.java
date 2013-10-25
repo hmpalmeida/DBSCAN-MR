@@ -52,6 +52,11 @@ public class Scan {
 
 	public static void main(String[] args) throws Exception {
 		// Adding legibility to the inputs
+		if (args.length != 5) {
+			System.out.println("Wrong number of parameters:"+String.valueOf(args.length));
+			System.out.println("Usage: dbscan-mr sig/nosig <sigma> <mi> <input> <output>");
+			System.exit(1);
+		}
 		boolean sig = false;
 		if (args[0].compareTo("sig") == 0) {
 			sig = true;

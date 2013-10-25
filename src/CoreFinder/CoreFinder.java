@@ -33,7 +33,8 @@ public class CoreFinder {
 		stats += defineCores(mi, similarities_file, cores_file);
 		long cores_time = System.currentTimeMillis() - cores_start_time;
 		Configuration conf = new Configuration();
-		conf.set("fs.default.name","hdfs://127.0.0.1:54310/");		
+		// FIXME SETTING THE FILESYSTEM?
+		//conf.set("fs.default.name","hdfs://127.0.0.1:54310/");		
 		FileSystem dfs = FileSystem.get(conf);
 		Path file = new Path(similarities_file);
 		if (dfs.exists(file)) dfs.delete(file, true);
@@ -48,10 +49,12 @@ public class CoreFinder {
 		// Minimum neighbor count for core
 		//conf.set("mi", String.valueOf(mi));
 		conf.set("job.customorder.path", order_file);
-		conf.set("fs.default.name","hdfs://127.0.0.1:54310/");		
+		// FIXME SETTING THE FILESYSTEM?
+		//conf.set("fs.default.name","hdfs://127.0.0.1:54310/");		
 		FileSystem dfs = FileSystem.get(conf);
 		
         Job job = new Job(conf, "Similarities");
+        
         
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
@@ -99,7 +102,8 @@ public class CoreFinder {
 		Configuration conf = new Configuration();
 		// Minimum neighbor count for core
 		conf.set("mi", String.valueOf(mi));
-		conf.set("fs.default.name","hdfs://127.0.0.1:54310/");		
+		// FIXME SETTING THE FILESYSTEM?
+		//conf.set("fs.default.name","hdfs://127.0.0.1:54310/");		
 		FileSystem dfs = FileSystem.get(conf);
 		
         Job job = new Job(conf, "CoreFinder");

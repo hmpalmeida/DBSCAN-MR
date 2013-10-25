@@ -20,7 +20,8 @@ public class CoreMerger {
 	
 	private long doMergeStep(String input_file, String output_file) throws IOException {
 		Configuration conf = new Configuration();
-		conf.set("fs.default.name","hdfs://127.0.0.1:54310/");		
+		// FIXME SETTING THE FILESYSTEM?
+		//conf.set("fs.default.name","hdfs://127.0.0.1:54310/");		
 		FileSystem dfs = FileSystem.get(conf);
 		
         Job job = new Job(conf, "MergeStep");
@@ -58,7 +59,8 @@ public class CoreMerger {
 	private void doPartialMerge(String merged_cores_file, String cores_file, 
 			String tmp_file) throws IOException {
 		Configuration conf = new Configuration();
-		conf.set("fs.default.name","hdfs://127.0.0.1:54310/");		
+		// FIXME SETTING THE FILESYSTEM?
+		//conf.set("fs.default.name","hdfs://127.0.0.1:54310/");		
 		FileSystem dfs = FileSystem.get(conf);
 		
         Job job = new Job(conf, "PartialMerge");
@@ -91,7 +93,8 @@ public class CoreMerger {
 	// Like the Basic Record Join from the original paper.
 	private void doMerge(String partial_merge_file, String output_file) throws IOException {
 		Configuration conf = new Configuration();
-		conf.set("fs.default.name","hdfs://127.0.0.1:54310/");		
+		// FIXME SETTING THE FILESYSTEM?
+		//conf.set("fs.default.name","hdfs://127.0.0.1:54310/");		
 		FileSystem dfs = FileSystem.get(conf);
 		
         Job job = new Job(conf, "ClusterCleaner");
@@ -124,7 +127,8 @@ public class CoreMerger {
 
 	private void generateCoresOnly(String cores_file, String cores_only_file) throws IOException {
 		Configuration conf = new Configuration();
-		conf.set("fs.default.name","hdfs://127.0.0.1:54310/");		
+		// FIXME SETTING THE FILESYSTEM?
+		//conf.set("fs.default.name","hdfs://127.0.0.1:54310/");		
 		FileSystem dfs = FileSystem.get(conf);
 		conf.set("job.core.file", cores_file);
 		
@@ -177,7 +181,8 @@ public class CoreMerger {
 		doMerge(tmp_file, final_file);
 		// Remove temporary files
 		Configuration conf = new Configuration();
-		conf.set("fs.default.name","hdfs://127.0.0.1:54310/");
+		// FIXME SETTING THE FILESYSTEM?
+		//conf.set("fs.default.name","hdfs://127.0.0.1:54310/");
 		FileSystem dfs = FileSystem.get(conf);
 		Path file = new Path(merged_file_a);
 		if (dfs.exists(file)) dfs.delete(file, true);
